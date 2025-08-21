@@ -176,7 +176,7 @@ print
 --		  3) Use SchemaBinding to protect the views from being orphaned!
 
 GO
-CREATE --DROP
+CREATE OR ALTER
 VIEW vCategories
 WITH SCHEMABINDING 
 AS 
@@ -186,7 +186,7 @@ GO
 SELECT CategoryID, CategoryName from vCategories;
 GO
 
-CREATE --DROP
+CREATE OR ALTER
 VIEW vProducts
 WITH SCHEMABINDING 
 AS 
@@ -196,8 +196,7 @@ GO
 SELECT ProductID, ProductName, CategoryID, UnitPrice FROM vProducts;
 GO
 
-GO
-CREATE --DROP
+CREATE OR ALTER
 VIEW vEmployees
 WITH SCHEMABINDING 
 AS 
@@ -208,8 +207,7 @@ SELECT EmployeeID, EmployeeFirstName, EmployeeLastName, ManagerID
   FROM vEmployees;
 GO
 
-GO
-CREATE --DROP
+CREATE OR ALTER
 VIEW vInventories
 WITH SCHEMABINDING 
 AS 
@@ -243,7 +241,8 @@ GO
 -- and the price of each product?
 -- Order the result by the Category and Product!
 
-CREATE --DROP
+GO
+CREATE OR ALTER
 VIEW vProductsByCategories
 AS
 SELECT TOP 1000000 
@@ -251,23 +250,22 @@ vC.CategoryName,
 vP.ProductName, 
 vP.UnitPrice 
 FROM vCategories as vC
-JOIN vProducts as vP 
+INNER JOIN vProducts as vP 
 ON vC.CategoryID = vP.CategoryID
 ORDER BY  vC.CategoryName, vP.ProductName;
 GO
-Select * From [dbo].[vProductsByCategories]
-GO
+
 -- Question 4 (10% pts): How can you create a view to show a list of Product names 
 -- and Inventory Counts on each Inventory Date?
 -- Order the results by the Product, Date, and Count!
 
-CREATE --DROP
+CREATE OR ALTER
 VIEW vInventoriesByProductsByDates
 AS
 SELECT TOP 1000000 
 vP.ProductName, vI.InventoryDate, vI.Count
 FROM vProducts as vP
-JOIN vInventories as vI
+INNER JOIN vInventories as vI
 ON vP.ProductID = vI.ProductID
 ORDER BY vp.ProductName, vI.InventoryDate, vI.Count;
 GO
@@ -277,14 +275,14 @@ GO
 -- and the Employee that took the count?
 -- Order the results by the Date and return only one row per date!
 
-CREATE --DROP
+CREATE OR ALTER
 VIEW vInventoriesByEmployeesByDates
 AS
 SELECT DISTINCT TOP 1000000 
 vI.InventoryDate, 
 [EmployeeName] = vE.EmployeeFirstName + ' ' + vE.EmployeeLastName
 FROM vInventories AS vI
-JOIN vEmployees AS VE
+INNER JOIN vEmployees AS VE
 ON vI.EmployeeID = vE.EmployeeID
 ORDER BY vI.InventoryDate
 GO
@@ -300,14 +298,14 @@ GO
 -- and the Inventory Date and Count of each product?
 -- Order the results by the Category, Product, Date, and Count!
 
-CREATE --DROP
+CREATE OR ALTER
 VIEW vInventoriesByProductsByCategories
 AS
 SELECT TOP 1000000 
 vC.CategoryName, vP.ProductName, vI.InventoryDate, vI.Count
 FROM vCategories as vC
-JOIN vProducts as vP ON vC.CategoryID = vP.CategoryID
-JOIN vInventories as vI ON vI.ProductID = vP.ProductID
+INNER JOIN vProducts as vP ON vC.CategoryID = vP.CategoryID
+INNER JOIN vInventories as vI ON vI.ProductID = vP.ProductID
 ORDER BY vc.CategoryName, vP.ProductName, vI.InventoryDate, vI.Count
 GO
 
@@ -317,7 +315,7 @@ GO
 -- Order the results by the Inventory Date, Category, Product and Employee!
 
 
-CREATE --DROP
+CREATE OR ALTER
 VIEW vInventoriesByProductsByEmployees
 AS
 SELECT TOP 1000000 
@@ -327,9 +325,9 @@ vI.InventoryDate,
 vI.Count, 
 [EmployeeName] = vE.EmployeeFirstName + ' ' + vE.EmployeeLastName
 FROM vCategories as vC
-JOIN vProducts as vP ON vC.CategoryID = vP.CategoryID
-JOIN vInventories as vI ON vI.ProductID = vP.ProductID
-JOIN vEmployees as vE ON vE.EmployeeID = vI.EmployeeID
+INNER JOIN vProducts as vP ON vC.CategoryID = vP.CategoryID
+INNER JOIN vInventories as vI ON vI.ProductID = vP.ProductID
+INNER JOIN vEmployees as vE ON vE.EmployeeID = vI.EmployeeID
 ORDER BY vI.InventoryDate, vC.CategoryName, vP.ProductName, EmployeeName;
 GO
 
@@ -338,7 +336,7 @@ GO
 -- the Inventory Date and Count of each product, and the Employee who took the count
 -- for the Products 'Chai' and 'Chang'? 
 
-CREATE 
+CREATE OR ALTER
 VIEW vInventoriesForChaiAndChangByEmployees
 AS
 SELECT TOP 1000000 
@@ -348,9 +346,9 @@ vI.InventoryDate,
 vI.Count, 
 [EmployeeName] = vE.EmployeeFirstName + ' ' + vE.EmployeeLastName
 FROM vCategories as vC
-JOIN vProducts as vP ON vC.CategoryID = vP.CategoryID
-JOIN vInventories as vI ON vI.ProductID = vP.ProductID
-JOIN vEmployees as vE ON vE.EmployeeID = vI.EmployeeID
+INNER JOIN vProducts as vP ON vC.CategoryID = vP.CategoryID
+INNER JOIN vInventories as vI ON vI.ProductID = vP.ProductID
+INNER JOIN vEmployees as vE ON vE.EmployeeID = vI.EmployeeID
 WHERE vP.ProductName IN ('Chai', 'Chang')
 ORDER BY vI.InventoryDate, vC.CategoryName, vP.ProductName, EmployeeName;
 GO
@@ -358,14 +356,14 @@ GO
 -- Question 9 (10% pts): How can you create a view to show a list of Employees and the Manager who manages them?
 -- Order the results by the Manager's name!
 
-CREATE --DROP
+CREATE OR ALTER
 VIEW vEmployeesByManager
 AS
 SELECT TOP 1000000 
 [ManagerName] = vM.EmployeeFirstName + ' ' + vM.EmployeeLastName,
 [EmployeeName] = vE.EmployeeFirstName + ' ' + vE.EmployeeLastName
 FROM vEmployees as vE  
-JOIN vEmployees as vM
+INNER JOIN vEmployees as vM
 ON vE.ManagerID = vM.EmployeeID
 ORDER BY ManagerName, EmployeeName;
 GO
@@ -375,7 +373,7 @@ GO
 -- BASIC Views? Also show the Employee's Manager Name and order the data by 
 -- Category, Product, InventoryID, and Employee.
 
-CREATE --DROP
+CREATE OR ALTER
 VIEW vInventoriesByProductsByCategoriesByEmployees
 AS
 SELECT TOP 1000000 
@@ -386,10 +384,10 @@ vE.EmployeeID,
 [EmployeeName] = vE.EmployeeFirstName + ' ' + vE.EmployeeLastName,
 [ManagerName] = vM.EmployeeFirstName + ' ' + vM.EmployeeLastName
 FROM vCategories as vC
-JOIN vProducts as vP ON vC.CategoryID = vP.CategoryID
-JOIN vInventories as vI ON vI.ProductID = vP.ProductID
-JOIN vEmployees as vE ON vE.EmployeeID = vI.EmployeeID
-JOIN vEmployees as vM ON vE.ManagerID = vM.EmployeeID
+INNER JOIN vProducts as vP ON vC.CategoryID = vP.CategoryID
+INNER JOIN vInventories as vI ON vI.ProductID = vP.ProductID
+INNER JOIN vEmployees as vE ON vE.EmployeeID = vI.EmployeeID
+INNER JOIN vEmployees as vM ON vE.ManagerID = vM.EmployeeID
 ORDER BY vC.CategoryName, vP.ProductName, vI.InventoryID, EmployeeName;
 GO
 
